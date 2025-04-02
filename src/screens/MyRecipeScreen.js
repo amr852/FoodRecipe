@@ -20,24 +20,53 @@ import {
     const [recipes, setrecipes] = useState([]);
     const [loading, setLoading] = useState(true);
   
-    useEffect(() => {
-      const fetchrecipes = async () => {
-        
-        };
-  
-      fetchrecipes();
-    }, []);
-  
+   useEffect(() => {
+  const fetchrecipes = async () => {
+    try {
+      const storedRecipes = await AsyncStorage.getItem("customrecipes");
+      if (storedRecipes !== null) {
+        const parsedRecipes = JSON.parse(storedRecipes);
+        setrecipes(parsedRecipes);
+      } else {
+        setrecipes([]); // no recipes found
+      }
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+      setrecipes([]); // fallback to empty array
+    } finally {
+      setLoading(false); // loading done
+    }
+  };
+
+  fetchrecipes();
+}, []);
+
     const handleAddrecipe = () => {
-
-    };
+  navigation.navigate("RecipesFormScreen");
+};
   
-    const handlerecipeClick = (recipe) => {
+   const handlerecipeClick = (recipe) => {
+  navigation.navigate("CustomRecipesScreen", { recipe });
+};
 
-    };
     const deleterecipe = async (index) => {
-    
-    };
+  try {
+    // Clone the current recipes array
+    const updatedrecipes = [...recipes];
+
+    // Remove the recipe at the specified index
+    updatedrecipes.splice(index, 1);
+
+    // Save the updated array to AsyncStorage
+    await AsyncStorage.setItem("customrecipes", JSON.stringify(updatedrecipes));
+
+    // Update the state to reflect the changes
+    setrecipes(updatedrecipes);
+  } catch (error) {
+    console.error("Error deleting recipe:", error);
+  }
+};
+
   
     const editrecipe = (recipe, index) => {
 
@@ -64,17 +93,35 @@ import {
               recipes.map((recipe, index) => (
                 <View key={index} style={styles.recipeCard} testID="recipeCard">
                   <TouchableOpacity testID="handlerecipeBtn" onPress={() => handlerecipeClick(recipe)}>
-                  
-                    <Text style={styles.recipeTitle}>{recipe.title}</Text>
-                    <Text style={styles.recipeDescription} testID="recipeDescp">
-                  
-                    </Text>
+                  {recipe.image && (
+    <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
+  )}
+  <Text style={styles.recipeTitle}>{recipe.title}</Text>
+  <Text style={styles.recipeDescription} testID="recipeDescp">
+    {recipe.description
+    ? recipe.description.slice(0, 50) + (recipe.description.length > 50 ? "..." : "")
+    : ""}
+  </Text>
                   </TouchableOpacity>
   
                   {/* Edit and Delete Buttons */}
                   <View style={styles.actionButtonsContainer} testID="editDeleteButtons">
                     
-                
+                   {/* Edit Button */}
+  <TouchableOpacity
+    style={styles.editButton}
+    onPress={() => editrecipe(recipe, index)}
+  >
+    <Text style={styles.editButtonText}>Edit</Text>
+  </TouchableOpacity>
+
+  {/* Delete Button */}
+  <TouchableOpacity
+    style={styles.deleteButton}
+    onPress={() => deleterecipe(index)}
+  >
+    <Text style={styles.deleteButtonText}>Delete</Text>
+  </TouchableOpacity>
                   </View>
                 </View>
               ))

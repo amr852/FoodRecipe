@@ -50,25 +50,32 @@ import {
       >
         {/* Recipe Image */}
         <View style={styles.imageContainer} testID="imageContainer">
-        {recipe.image && (
-            <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
-          )}
-        </View>
+  {recipe.image && (
+    <Image
+      source={{ uri: recipe.image }}
+      style={[styles.recipeImage, { height: hp(35) }]} // You can adjust height here if needed
+    />
+  )}
+</View>
+
         <View
           style={styles.topButtonsContainer} testID="topButtonsContainer"
         >
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Text>Back</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleToggleFavorite}
-            style={styles.favoriteButton}
-          >
-            <Text>{isFavourite ? "♥" : "♡"}</Text>
-          </TouchableOpacity>
+    onPress={() => navigation.goBack()}
+    style={styles.backButton}
+  >
+    <Text style={{ fontSize: hp(2), color: "#000" }}>GoBack</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    onPress={handleToggleFavorite}
+    style={styles.favoriteButton}
+  >
+    <Text style={{ fontSize: hp(2.5), color: "red" }}>
+      {isFavourite ? "♥" : "♡"}
+    </Text>
+  </TouchableOpacity>
         </View>
   
         {/* Recipe Details */}
